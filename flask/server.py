@@ -1,50 +1,36 @@
-from flask import Flask, jsonify
+from flask import Flask
+import datetime
+import json
+
+x = datetime.datetime.now()
 
 app = Flask(__name__)
 
-@app.after_request
-def add_cors_headers(response):
-    """
-    Append CORS headers to every request.
+# Generate a unique ID for each person
+def generate_unique_id():
+    return str(datetime.datetime.now().timestamp())
 
-    NOTE: Unsafe for deplpoyment. Should only be used for development purposes.
-    """
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-
-    return response
-
-@app.route('/')
-def root():
-    return "This is root"
-
-@app.route('/test')
-def test():
-    return "testing"
-
-@app.route("/students", methods=["GET"])
-def students():
-    """
-    Returns currently checked-in students. Currently just a dummy.
-    """
-    students = [
+@app.route('/data')
+def get_data():
+    data = [
         {
-            'firstName': 'Eric',
-            'lastName': 'Roth',
-            'lab': 'AYC',
-            'date': '1690054337',
-            'notes': 'None'
-        }, {
-            'firstName': 'Tyler',
-            'lastName': 'Cushing',
-            'lab': 'AYC',
-            'date': '1690054389',
-            'notes': 'None'
+            "id": generate_unique_id(),
+            "firstName": "Tyler",
+            "lastName": "Cushing",
+            "lab": "AYC",
+            "date": "9:53AM 9/10/22",
+            "notes": "No notes"
+        },
+        {
+            "id": generate_unique_id(),
+            "firstName": "Eric",
+            "lastName": "Roth",
+            "lab": "AYC",
+            "date": "9:53AM 9/10/22",
+            "notes": "No notes"
         }
     ]
+    return json.dumps(data, indent=4)
 
-    return jsonify(students)
-
-if __name__=='__main__':
-    app.run(host="127.0.0.1", port=5000)
+if __name__ == '__main__':
+    app.run(debug=True)

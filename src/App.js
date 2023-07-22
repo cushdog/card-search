@@ -1,9 +1,22 @@
 import './App.css';
 import VerticalCard from './Components/VerticalCard';
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
+import Accordion from './Components/Accordian';
+import { useState, useEffect } from 'react';
 
 function App() {
+  const [people, setPeople] = useState([]);
+
+  const [lab, setLab] = useState("");
+
+  useEffect(() => {
+    fetch("/data")
+      .then((res) => res.json())
+      .then((info) => {
+        setPeople(info);
+        console.log(people);
+      });
+  }, []);
 
   const [searchInput, setSearchInput] = useState('');
 
@@ -11,34 +24,33 @@ function App() {
     setSearchInput(event.target.value);
   };
 
-  const person = {
-    "firstName": "Tyler",
-    "lastName": "Cushing",
-    "lab": "AYC",
-    "date": "9:53AM 9/10/22",
-    "notes": "No notes"
-  };
-
-  let people = [person]
-
-  let people_new = people.filter((el) => {
-		if (searchInput === '') {
-			return el;
-		} else {
-      var values = [];
-      for (var key in el) {
-        values.push(el[key]);
+  let peopleFiltered = people.filter((person) => {
+    if (searchInput === '') {
+      return true;
+    } else {
+      
+      for (const value of Object.values(person)) {
+        if (typeof value === 'string' && value.includes(searchInput)) {
+          return true;
+        }
       }
-      return values.includes(searchInput);
-		}
-	})
+      return false;
+    }
+  });
+
+  const handleChange = (event) => {
+    setLab(event.target.value);
+  };
 
   return (
     <div className='student_row'>
-      <TextField id="outlined-basic" value={searchInput} onChange={handleInputChange} label="Search for a student..." variant="outlined" />
-      {people_new.map((item, index) => (
-          <VerticalCard key={index} name={item["firstName"] + " " + item["lastName"]} lab={item["lab"]} date={item["date"]} notes={item["notes"]} />
+      <Accordion age={lab} handleChange={handleChange} />
+      <TextField id="outlined-basic" value={searchInput} onChange={handleInputChange} label="Search for a student..." variant="outlined" sx={{paddingBottom: '10px'}} />
+      <div className='card-container'>
+        {peopleFiltered.map((item) => (
+          <VerticalCard key={item.id} name={item["firstName"] + " " + item["lastName"]} lab={lab} date={item["date"]} notes={item["notes"]} />
         ))}
+      </div>
     </div>
   );
 }
