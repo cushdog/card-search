@@ -1,11 +1,39 @@
 import './App.css';
 import VerticalCard from './Components/VerticalCard';
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const url = "http://localhost:5000/"
+
+const fetchResource = async (url, method) => {
+  const headers = {
+    /* add headers here */
+  }
+
+  try {
+    const resp = await fetch(url, { method: method, headers: headers });
+
+    /* Deal with headers here. If we decide to deal with them externally, rethink design */
+    
+    const type = resp.headers.get("Content-Type");
+    if (type.includes("text/html")) {
+      return await resp.text();
+    } if (type.includes("application/json")) {
+      return await resp.json();
+    }
+  } catch (error) {
+    console.error("Error fetching resource: ", error);
+  }
+}
 
 function App() {
 
   const [searchInput, setSearchInput] = useState('');
+
+  useEffect(() => {
+    fetchResource(url + "students", "GET").then(data => console.log(data));
+    fetchResource(url, "GET").then(data => console.log(data));
+  }, []);
 
   const handleInputChange = (event) => {
     setSearchInput(event.target.value);
@@ -44,10 +72,6 @@ function App() {
 }
 
 export default App;
-
-
-
-
 
 // import './App.css';
 // import * as React from 'react';
