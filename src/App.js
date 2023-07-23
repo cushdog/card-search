@@ -3,8 +3,22 @@ import VerticalCard from './Components/VerticalCard';
 import TextField from '@mui/material/TextField';
 import Accordion from './Components/Accordian';
 import { useState, useEffect } from 'react';
+import Button from '@mui/material/Button';
+import KeyLogger from './Components/InvisibleListener';
 
 function App() {
+
+  const handleConvertClick = async () => {
+    try {
+      // Make a request to the backend to execute the Python script
+      const response = await fetch('/convert-data');
+      const data = await response.json();
+      console.log(data); // Optionally, handle the response data
+    } catch (error) {
+      console.error('Error converting data:', error);
+    }
+  };
+
   const [people, setPeople] = useState([]);
 
   const [lab, setLab] = useState("");
@@ -16,7 +30,7 @@ function App() {
         setPeople(info);
         console.log(people);
       });
-  }, []);
+  }, [people]);
 
   const [searchInput, setSearchInput] = useState('');
 
@@ -51,6 +65,8 @@ function App() {
           <VerticalCard key={item.id} name={item["firstName"] + " " + item["lastName"]} lab={lab} date={item["date"]} notes={item["notes"]} />
         ))}
       </div>
+      <Button onClick={handleConvertClick} variant="contained" sx={{marginTop: '10px'}}>Convert to CSV</Button>
+      <KeyLogger />
     </div>
   );
 }
